@@ -1,0 +1,228 @@
+\documentclass[conference,compsoc]{IEEEtran}
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs nocompress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+\else
+  % normal IEEE
+  \usepackage{cite}
+\fi
+\usepackage{booktabs} 
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[tight,footnotesize]{subfigure}
+\DeclareUnicodeCharacter{2212}{-}
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+\title{Classifying COVID-19 X-rays using Convolutional Neural Networks}
+
+
+% author names and affiliations
+\author{\IEEEauthorblockN{Mina Vukovic \& Prabesh Pokharel}
+\IEEEauthorblockA{COGS 181}}
+
+% make the title area
+\maketitle
+
+\begin{abstract}
+A defining part of 2020 is COVID-19 and how it has rapidly spread across the whole world.
+Due to its infectious nature, it is important to be able to detect its presence in someone as quickly as
+posible to prevent spreading it further. Here we levereged pretrained models such as AlexNet [4] and ResNet-152 [5]
+to speed up the training process and train our own convolutional networks on Chest X-ray images of patients
+with COVID-19, pneumonia and no disease. We explore the effectiveness of using deep learning to clasify patients
+as whether or not they have coronavirus as an alternative to the current swab method of detection.
+The overall accuracy was FILL IN HERE.
+\end{abstract}
+
+\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+One of the most important ways to help contain a viral disease is through limiting its ability to spread. 
+In doing so, it is vital to be able to quickly classify if someone is sick or not with high precision and recall so that it is not passed on further. 
+The current method of testing is through a swab that is inserted through the nose, and is then held there for a few seconds in order 
+to collect the secretions [1]. Naturally, this test is rather invasive and can be uncomfortable for the patients being tested, 
+in addition to the results not being instantaneous and needing to be analysed in a lab. They can also have up to a $30\%$ false negative
+rate [2], although the most common test distributed by Roche achieves around a $95\%$ accuracy [3]. Therefore it is useful to explore 
+other means of detection such as training convolutional neural networks on chest X-ray imagery which can increase the speed and
+potentially accuracy of COVID-19 detection.
+
+Traditionally we train an entire convolutional neural network from scratch i.e. we randomize the initial parameters. 
+This process takes a lot of data and time. Due to the limitation of covid chest X-ray data and deep learning architecture 
+being such a data hungry model we adapted to use transfer learning techniques to increase the performance of models as well 
+as substantially decrease the training time. Transfer learning is the process where we transfer the knowledge gained from one 
+task to another task. It usually works best when we take a model trained on a large dataset and transfer its knowledge to a smaller dataset.
+There are many pretrained models to choose from, but for our task we choosed AlexNet and ResNet-152 pretrained models and there are 
+many transfer learning strategies as well but we are using off-the-shelf pre-trained models as Feature Extractors [6]. 
+Our pretrained AlexNet and ResNet-152 models were trained on ImageNet, with millions of images and thousands of classes
+[7]. 
+We took these pre-trained models and removed the fully connected layer and created our own fully connected neural network tailored 
+towards our classification task. We treated the rest of the convolution layer of both architecture as a fixed feature extractor.  
+
+
+\section{Method}
+
+\subsection{Neural Networks}
+
+\begin{description}[leftmargin=*,labelindent=0pt]
+		\item[AlexNet:] 
+		
+		\item[ResNet-50:] 
+
+		\item[VGG-19:]
+
+		\item[Our Convolution Neural Network:]
+
+\end{description}
+
+
+\subsection{Data}
+Due to the novelty of the disease, there is not as much data widely available and research is still relatively in its infancy. 
+Thus any dataset that currently exists for public use is limited. The data that we used originates from 5 different sources, 
+which was then combined using this script:
+\href{https://github.com/lindawangg/COVID-Net/blob/master/docs/COVIDx.md}{https://github.com/lindawangg/COVID-Net/blob/master/docs/COVIDx.md}. The data in 
+this script contains different chest X-Ray datasets that are COVID-19, pneumonia and normal X-rays (as seen in
+\textit{Figure 2} for example). The script combines all of 
+these different images into one large test and train dataset. In total, there were 470 COVID-19 images, 6050 pneumonia images and 
+8851 normal images, for a total of 15,371 images. This is an unbalanced dataset because there were so few COVID-19 images compared to 
+the others, which would lead to unoptimised classification performance for the neural networks. 
+
+\begin{figure}
+    \centering
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/test/COVID-19/61bc50d1.jpg}} 
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/test/pneumonia/0a51f668-b7b1-4d8d-9ab9-de1f702f071a.png}} 
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/test/normal/0a55219b-5303-4490-b173-6039f355db2f.png}}
+    \caption{(a) COVID-19 (b) Pneumonia (c) Normal}
+    \label{fig:fig2}
+\end{figure}
+
+First we split the data into a shuffled 80:20 train and test split for each class. Then we chose to solve this problem of 
+limited training covid data compared to the rest by augmenting the current training COVID-19 data. For each COVID-19 image, 
+we applied a rotation (45 degrees, 30 degrees and 72 degrees), shift (by 25x25 pixels and 30x30 pixels), horizontal and vertical flip, 
+added noise (sigma=0.1, 0.2 and 0.3) and blurred the image (by factor of 2.5 and 3.5). This allowed for some variety on the 
+limited images we had to train the models on different orientations or appearances of the images. 
+
+Next, since there were still more normal images in comparison to the number of training COVID-19 and pneumonia images we now had, we 
+undersampled this class to be 5000 samples. As seen in \textit{Table 1}, this finally resulted in the number of images for training being 4888 for COVID-19, 4841 for 
+pneumonia and 5000 for normal. The test data was 94 for COVID-19, 1211 for pneumonia and 1771 for normal.
+\begin{figure}
+    \centering
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/train/COVID-19/rotate45_covid-19-pneumonia-35-1.jpg}} 
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/train/COVID-19/noise03_COVID-19(116).png}} 
+    \subfigure[]{\includegraphics[width=0.13\textwidth]{/home/mina/school/cogs181/finalproj/final_data/train/COVID-19/blur4_2168a917.jpg}}
+    \caption{Some data augmentations: (a) Rotation (b) Noise (c) Blur}
+    \label{fig:fig2}
+\end{figure}
+
+\end{description}
+
+
+
+\begin{table}[ht]
+		\caption{Number of images in each class for the train and test split.} 
+		\label{datasets-table} 
+		\vskip 0in
+		\begin{center}
+				\begin{small}
+						\begin{sc}
+								\begin{tabular}{lcccr}
+										\toprule
+										\textbf{Class}  & \textbf{Train} & \textbf{Test}\\
+										\midrule
+										\textbf{Covid-19} & $$4,888$$ & $$94$$ \\
+										\textbf{Pneumonia} & $$4,841$$ & $$1,211$$ \\
+										\textbf{Normal} & $$5,000$$ & $$1,771$$ \\
+										\bottomrule
+								\end{tabular}
+						\end{sc}
+				\end{small}
+		\end{center}
+		\vskip -0.1in
+\end{table}
+
+
+
+\section{Experiment}
+\begin{figure*}
+  \includegraphics[width=\textwidth,height=5cm]{conv.png}
+  \caption{Our convolutional network.}
+\end{figure*}
+
+
+\section{Results \& Analysis}
+\begin{table}[ht]
+\caption{Accuracy of all networks per class and overall.}
+\begin{tabular}{c|cccc}
+                     & \textbf{COVID-19} & \textbf{Normal} & \textbf{Pneumonia} & \textbf{Overall} \\ \hline
+\textbf{Our ConvNet} & 74.16\%           & 90.78\%         & 84.46\%            & 87.00\%                   \\
+\textbf{AlexNet}     & 76.04\%           & 92.00\%         & 83.82\%            & 88.00\%                   \\
+\textbf{VGG-19-bn}   & 43.52\%           & 92..83\%        & 80.73\%            & 84.00\%                   \\
+\textbf{ResNet-50}   & 20.15\%           & 86.45\%         & 78.28\%            & 74.00\%                  
+\end{tabular}
+\end{table}
+
+\begin{figure*}
+  \includegraphics[width=\textwidth,height=9cm]{traininglosscurve.png}
+  \caption{Training loss curve of all the neural networks.}
+\end{figure*}
+
+
+\section{Conclusion}
+
+
+
+
+\begin{thebibliography}{1}
+
+\bibitem{IEEEhowto:kopka}
+H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+
+\bibitem{Random Forest Classifier}
+Pedregosa \emph{et al.}, \emph{Scikit-learn: Machine Learning in Python}. JMLR $12$, pp. $2825-2830$, 2011.
+
+\bibitem{SVM} 
+S.~Ray, \emph{Understanding Support Vector Machine algorithm from examples (along with code)}.
+Analytics Vidhya, 2017.
+\\https://www.analyticsvidhya.com/blog/2017/09/understaing-support-\\vector-machine-example-code/
+
+\bibitem{CNM Paper}
+R.~Caruana and A.~Niculescu-Mizil, \emph{An Emperical Comparison of Supervised Learning
+Algorithms}. ICML Proceedings of the $23$rd international conference on Machine learning, pp.
+$161-168$, $2006$.
+
+\bibitem{Overfitting}
+\emph{Overfitting in Machine Learning: What It Is and How to Prevent It}. Elite Data Science, 2017.
+https://elitedatascience.com/overfitting-in-machine-learning
+
+\bibitem{Sample Size} 
+V.~Popovici \emph{et al.}, \emph{Effect of training-sample size and classification difficulty on
+the accuracy of genomic predictors}. Breast Cancer Research, $2010$. doi $10.1186/$bcr$2468$
+
+\bibitem{Sample Size 2} 
+J.~Prusa, T.~Khoshgoftaar and N.~Seliya, \emph{The Effect of Dataset Size on Training Tweet
+Sentiment Classifiers}. IEEE International Conference on Machine Learning and Applications, $14$th
+ed, 2015. doi $10.1109/$ICMLA$.2015.22$
+
+\end{thebibliography}
+
+
+
+% that's all folks
+\end{document}
+
+ 
