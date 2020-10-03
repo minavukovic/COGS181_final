@@ -7,3 +7,5 @@ professionals detect the virus in patients. The overall results showed AlexNet t
 our convolutional network in second, and then VGG-19, then lastly ResNet. The results of this study are a step forward into exploring
 alternative methods for classifying this prominent virus.
 
+[Rest of paper.](https://github.com/minavukovic/Detecting-COVID-19-with-Convolutional-Neural-Networks/blob/master/paper.pdf)
+
